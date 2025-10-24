@@ -89,24 +89,131 @@ HyperHeadLockSystem: {
         latencyMs: -30,
         overshootProtection: true,
         overshootLimit: 0.0,
-        debugLog: false
+        debugLog: false,
+
     },
 
-    InstantDragToBoneHead: {
-        enabled: true,
-        targetBone: "bone_Head",
-        snapOnDragStart: true,
-        holdLockWhileDragging: true,
-        maxSnapDistance: 0.01,
-        trackingSpeed: 2.0,
-        smoothing: 0.0,
-        snapToleranceAngle: 0.0,
-        disableBodyRecenter: true,
-        predictionFactor: 1.0,
-        boneOffset: { x: -0.0456970781, y: -0.004478302, z: -0.0200432576 },
-        rotationOffset: { x: 0.0258174837, y: -0.08611039, z: -0.1402113, w: 0.9860321 },
-        scale: { x: 1.0, y: 1.0, z: 1.0 }
-    },
+   // instantdragtobonehead.js
+// File cấu hình InstantDragToBoneHead + toàn bộ thông số chống rung & giảm giật
+
+const InstantDragToBoneHead = {
+  enabled: true,
+  targetBone: "bone_Head",
+  snapOnDragStart: true,
+  holdLockWhileDragging: true,
+  maxSnapDistance: 0.01,
+  trackingSpeed: 2.0,
+  smoothing: 0.0,
+  snapToleranceAngle: 0.0,
+  disableBodyRecenter: true,
+  predictionFactor: 1,
+
+  // --- Toàn bộ cấu hình giảm giật, rung và ghim tâm được nhúng ở đây ---
+  config: `# --- Fix Rung Mạnh Config - Tối Ưu Giảm Giật & Rung ---
+
+# --- Giảm Giật Và Rung Tối Đa ---
+RecoilSuppressionMaster=2
+AntiShake Stablizer=2
+ZeroRecoilDrag=2
+SmoothRecoilControl=2
+StabilizedDragForce=2
+DragRecoilFixer=2
+GripForceStabilizer=2
+RecoilLockdown=2
+ZeroDriftFix=2
+GripMomentumControl=2
+DragResistanceEnhancer=2
+UltraStabilizedDrag=2
+RecoilSmoothing=2
+PrecisionGripFix=2
+LowFrictionGrip=2
+
+VerticalRecoil Suppression=1
+HorizontalShake Reduction=1
+RealTimeGun Stability Control=1
+DynamicRecoil Feedback Modulation=1
+AdvancedShooting Balance=1
+InteractiveWeapon Response=1
+RealTimeCrosshair Anchor=1
+AutoRecoil Adjust System=1
+StabilizedFiring Rate Control=1
+QuickRecoil Reset Options=1
+
+# --- Cải Tiến Cho Độ Chính Xác và Giảm Giật ---
+RecoilAutoBalance=2
+TouchDriftFix=2
+RecoilPressureCompensator=2
+GripCalibrationTuning=2
+GripForceControl=2
+DragFlowStabilizer=2
+PressureGripFix=2
+VerticalDragCorrection=2
+HorizontalDragFixer=2
+AntiShakeEnhancer=2
+QuickGripCorrection=2
+SuperStableDrag=2
+StableSwipeCalibration=2
+
+# --- Tăng Tốc Độ Độ Chính Xác, Giảm Trễ ---
+ZeroLatencyTouchControl=2
+RealTimeRecoilFixer=2
+QuickDragRestraint=2
+DragStabilityEnhancer=2
+TouchPressureBalancer=2
+TouchInputFixer=2
+SwipeStabilizer=2
+RapidGripAdjustment=2
+FineGripOptimizer=2
+
+# --- Ghim Tâm Giảm Lố - Cấu Hình Kéo Tâm Chính Xác ---
+# --- Tạo Mặt Nạ Ghim Tâm, Giảm Quá Dính, Tăng Chính Xác ---
+
+# --- Kéo Tâm Chính Xác & Ghim Tâm ---
+PrecisionAimLock=2
+VerticalAimFix=1
+HorizontalAimFix=1
+SmoothGripControl=2
+DragStabilityBalancer=2
+GripSensitivityTuning=2
+AutoAimFix=1
+DragSpeedAdjuster=2
+DragControlLimiter=1
+TouchGripResponse=2
+DynamicGripReset=2
+
+# --- Ghim Tâm, Giảm Lệch, Giảm Quá Dính ---
+AutoCenteringFix=2
+RealTimeAimLock=2
+VerticalDragLimiter=2
+HorizontalDragLimiter=2
+HeadSnapLimiter=1
+DragPrecisionTuner=2
+GripCorrectionEnhancer=2
+NoExcessiveGrip=2
+BalancedDragControl=2
+RealTimePrecisionSync=2
+
+# --- Giảm Quá Dính, Cải Tiến Độ Chính Xác ---
+ZeroLateralMovement=1
+ZeroVerticalDrift=1
+NoAimSnapFixer=2
+TouchSensitivityLock=2
+DragReductionOptimizer=2
+RecoilCorrectionSystem=1
+DragAndDropSync=1
+GripForceLimiter=1
+ZeroFluctuationDrag=2
+
+# --- Ghim Tâm Mượt Mà, Chính Xác, Không Lệch ---
+GripStabilizer=2
+FastDragControl=2
+TouchInputCorrection=1
+DragSpeedLimiter=2`
+};
+
+// Xuất module
+export default InstantDragToBoneHead;
+
 
     PointerSpeedBoost: { pointerSpeedBoost: 9, confPointerTiming: 1, selectPointerSpeedRoot9: 1 },
     PPIInjection: { ppiOverride: 550, selectPPIInfo: 1 },
