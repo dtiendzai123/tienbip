@@ -387,8 +387,639 @@ const FreeFireAutoHeadLockModule = (() => {
       return this.x;
     }
   }
+// == Enhanced Weapon Profiles ==
+const WeaponProfiles = {
+  "AK47": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "M4A1": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "SCAR": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "FAMAS": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "GROZA": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "AN94": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "XM8": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "MP40": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "UMP": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "P90": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "MP5": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "THOMPSON": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "AWM": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "KAR98K": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "M82B": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "M1014": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "SPAS12": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "MAG7": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "M1887": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "M249": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "GATLING": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "DESERT_EAGLE": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "M500": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "G18": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 },
+  "DEFAULT": { recoilSmooth: 9999.0, dragSensitivity: 9999.0, aimLockStrength: 9999.0, accuracyBoost: 9999.0, lockRadius: 9999.0 }
+};
 
-  // ===== Race Config (BaseMale) =====
+// == Dynamic Sensitivity ==
+function getAdvancedDragSensitivity(currentAim, targetPos, velocity, profile, baseSensitivity = 1.0) {
+  const dx = currentAim.x - targetPos.x;
+  const dy = currentAim.y - targetPos.y;
+  const dz = currentAim.z - targetPos.z;
+  const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+  const maxRadius = profile.lockRadius || 360.0;
+  const distanceFactor = Math.max(0.1, 1 - (dist / maxRadius));
+
+  const velocityMagnitude = velocity.length();
+  const velocityFactor = 1 + (velocityMagnitude * 0.5);
+
+  const weaponSensitivity = profile.dragSensitivity || 3.0;
+
+  return baseSensitivity * weaponSensitivity * distanceFactor * velocityFactor;
+}
+
+// == Aim Lock System ==
+class AimLockUltimate {
+  constructor(currentWeapon = "DEFAULT") {
+    this.profile = WeaponProfiles[currentWeapon] || WeaponProfiles["DEFAULT"];
+    this.weapon = currentWeapon;
+
+    this.kalman = {
+      x: new AdvancedKalmanFilter(0.005, 0.000002),
+      y: new AdvancedKalmanFilter(0.005, 0.000002),
+      z: new AdvancedKalmanFilter(0.005, 0.000002)
+    };
+
+    this.prevPos = null;
+    this.velocity = Vector3.zero();
+    this.acceleration = Vector3.zero();
+    this.recoilOffset = Vector3.zero();
+    this.lastUpdate = Date.now();
+    this.lockHistory = [];
+    this.currentAim = Vector3.zero();
+
+    this.predictionTime = 0.0001;
+    this.smoothingFactor = 0.0001;
+    this.lockConfidence = 0.0;
+  }
+
+  updateLockConfidence(enemy, player) {
+    let confidence = 0.0;
+    if (enemy.visible) confidence += 0.3;
+    if (enemy.inFov) confidence += 0.3;
+    if (enemy.headDetected) confidence += 0.3;
+    if (player.fpsStable) confidence += 0.1;
+    this.lockConfidence = Math.min(confidence, 1.0);
+  }
+
+  updateEnemyPosition(rawPos) {
+    const now = Date.now();
+    const dt = Math.min((now - this.lastUpdate) / 1000, 0.1);
+
+    if (this.prevPos && dt > 0) {
+      const newVelocity = rawPos.subtract(this.prevPos).multiplyScalar(1 / dt);
+      const newAcceleration = newVelocity.subtract(this.velocity).multiplyScalar(1 / dt);
+
+      this.velocity = this.velocity.lerp(newVelocity, 0.3);
+      this.acceleration = this.acceleration.lerp(newAcceleration, 0.2);
+    }
+
+    this.prevPos = rawPos.clone();
+    this.lastUpdate = now;
+
+    const filtered = new Vector3(
+      this.kalman.x.adaptiveFilter(rawPos.x),
+      this.kalman.y.adaptiveFilter(rawPos.y),
+      this.kalman.z.adaptiveFilter(rawPos.z)
+    );
+
+    return filtered;
+  }
+
+  predictPosition(filteredPos) {
+    const velocityPrediction = this.velocity.multiplyScalar(this.predictionTime);
+    const accelerationPrediction = this.acceleration.multiplyScalar(0.5 * this.predictionTime * this.predictionTime);
+    return filteredPos.add(velocityPrediction).add(accelerationPrediction);
+  }
+
+  applyAdvancedRecoilCompensation(recoilOffset) {
+    const smoothing = this.profile.recoilSmooth || 0.9;
+    const strength = this.profile.aimLockStrength || 10.0;
+    const compensated = recoilOffset.multiplyScalar(strength);
+    this.recoilOffset = this.recoilOffset.multiplyScalar(smoothing).add(compensated.multiplyScalar(1 - smoothing));
+  }
+
+  calculateLockConfidence(currentAim, targetPos) {
+    const distance = currentAim.subtract(targetPos).length();
+    const maxDistance = this.profile.lockRadius || 360.0;
+    this.lockConfidence = Math.max(0, 1 - (distance / maxDistance));
+    return this.lockConfidence;
+  }
+
+  dragAndLockHead(predictedPos, currentAim) {
+    const sensitivity = getAdvancedDragSensitivity(currentAim, predictedPos, this.velocity, this.profile);
+    const targetDelta = predictedPos.subtract(this.recoilOffset).subtract(currentAim);
+    const adjustedDelta = targetDelta.multiplyScalar(sensitivity * this.smoothingFactor);
+    const accuracyBoost = this.profile.accuracyBoost || 10.0;
+    const finalAim = currentAim.add(adjustedDelta).multiplyScalar(accuracyBoost);
+    this.currentAim = finalAim;
+    this.setCrosshair(finalAim);
+    return finalAim;
+  }
+
+  setCrosshair(vec3) {
+    console.log(`🎯 [${this.weapon}] Locking Aim: ${vec3.x.toFixed(6)}, ${vec3.y.toFixed(6)}, ${vec3.z.toFixed(6)} | Confidence: ${(this.lockConfidence * 100).toFixed(1)}%`);
+  }
+
+  update(enemyHeadPos, recoilOffset, currentAim) {
+    this.currentAim = currentAim;
+
+    const filteredPos = this.updateEnemyPosition(enemyHeadPos);
+    const predictedPos = this.predictPosition(filteredPos);
+    this.applyAdvancedRecoilCompensation(recoilOffset);
+    this.calculateLockConfidence(currentAim, predictedPos);
+    const newAim = this.dragAndLockHead(predictedPos, currentAim);
+
+    this.lockHistory.push({
+      timestamp: Date.now(),
+      confidence: this.lockConfidence,
+      distance: currentAim.subtract(predictedPos).length()
+    });
+
+    if (this.lockHistory.length > 100) {
+      this.lockHistory.shift();
+    }
+
+    return newAim;
+  }
+
+  getPerformanceStats() {
+    if (this.lockHistory.length === 0) return null;
+
+    const recent = this.lockHistory.slice(-20);
+    const avgConfidence = recent.reduce((sum, h) => sum + h.confidence, 0) / recent.length;
+    const avgDistance = recent.reduce((sum, h) => sum + h.distance, 0) / recent.length;
+
+    return {
+      avgConfidence: avgConfidence * 100,
+      avgDistance: avgDistance * 1000,
+      weapon: this.weapon,
+      samples: recent.length
+    };
+  }
+}
+
+// == Trigger Lock ==
+function advancedTriggerLock(currentAim, targetPos, velocity, profile, baseThreshold = 0.003) {
+  const dx = currentAim.x - targetPos.x;
+  const dy = currentAim.y - targetPos.y;
+  const dz = currentAim.z - targetPos.z;
+  const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+  const weaponThreshold = baseThreshold * (profile.lockRadius || 1.0);
+  const velocityMagnitude = velocity.length();
+  const velocityAdjustment = 1 + (velocityMagnitude * 0.1);
+  const adjustedThreshold = weaponThreshold * velocityAdjustment;
+
+  return {
+    shouldFire: dist <= adjustedThreshold,
+    distance: dist,
+    threshold: adjustedThreshold,
+    confidence: Math.max(0, 1 - (dist / adjustedThreshold))
+  };
+}
+
+// ... (Vector3, AdvancedKalmanFilter, WeaponProfiles, AimLockUltimate, TriggerLock từ phần trước giữ nguyên)
+
+// == Enhanced Usage Example ==
+const boneHeadPos = new Vector3(-0.0456970781, -0.004478302, -0.0200432576);
+const recoilOffset = new Vector3(0.0, 0.0, 0.0);
+const currentAim = new Vector3(-0.0456970781, -0.004478302, -0.0200432576);
+const weaponsToTest = ["M1887", "MP40", "M1014", "UMP"];
+
+function runInfiniteLoop() {
+  for (const currentWeapon of weaponsToTest) {
+    const enhancedAimSystem = new AimLockUltimate(currentWeapon);
+    const newAim = enhancedAimSystem.update(boneHeadPos, recoilOffset, currentAim);
+
+    const triggerResult = advancedTriggerLock(
+      newAim,
+      boneHeadPos,
+      enhancedAimSystem.velocity,
+      enhancedAimSystem.profile
+    );
+
+    if (triggerResult.shouldFire) {
+      console.log(`🔥 FIRE - ${currentWeapon} | Confidence: ${(triggerResult.confidence * 100).toFixed(1)}% | Distance: ${(triggerResult.distance * 1000).toFixed(2)}mm`);
+    } else {
+      console.log(`🚫 NO FIRE - ${currentWeapon} | Distance: ${(triggerResult.distance * 1000).toFixed(2)}mm`);
+    }
+
+    const stats = enhancedAimSystem.getPerformanceStats();
+    if (stats) {
+      console.log(`📊 [${currentWeapon}] Confidence: ${stats.avgConfidence.toFixed(1)}%, Distance: ${stats.avgDistance.toFixed(2)}mm`);
+    }
+
+    console.log("----------------------------------------------------");
+  }
+
+  setTimeout(runInfiniteLoop, 0); // 🔁 Lặp lại nhanh không chặn chính
+}
+
+// 🚀 Bắt đầu vòng lặp
+runInfiniteLoop();
+
+// == Weapon Switching ==
+function switchWeapon(newWeapon) {
+  if (WeaponProfiles[newWeapon]) {
+    const enhancedAimSystem = new AimLockUltimate(newWeapon);
+    console.log(`🔫 Switched to ${newWeapon} - Profile loaded`);
+    return enhancedAimSystem;
+  } else {
+    console.log(`❌ Unknown weapon: ${newWeapon}, using DEFAULT profile`);
+    return new AimLockUltimate("DEFAULT");
+  }
+}
+
+// == Dynamic Tuning by Distance/Mode ==
+function detectOptimalSettingsForDistance(weapon, gameMode = "normal", distanceKey) {
+  const baseProfile = WeaponProfiles[weapon] || WeaponProfiles["DEFAULT"];
+  const modeMultipliers = {
+    "normal": 9999.0,
+    "ranked": 9999.0,
+    "close_combat": 9999.0,
+    "long_range": 9999.0
+  };
+  const distanceMultipliers = {
+    close: 9999.0,
+    medium: 9999.0,
+    far: 9999.0,
+    veryFar: 999.95
+  };
+
+  const modeMultiplier = modeMultipliers[gameMode] || 1.0;
+  const distanceMultiplier = distanceMultipliers[distanceKey] || 1.0;
+  const totalMultiplier = modeMultiplier * distanceMultiplier;
+
+  return {
+    ...baseProfile,
+    dragSensitivity: baseProfile.dragSensitivity * totalMultiplier,
+    aimLockStrength: baseProfile.aimLockStrength * totalMultiplier,
+    accuracyBoost: baseProfile.accuracyBoost * totalMultiplier
+  };
+}
+
+function getAllSettingsForWeapon(weapon) {
+  const gameModes = ["normal", "ranked", "close_combat", "long_range"];
+  const distanceKeys = ["close", "medium", "far", "veryFar"];
+  const allSettings = {};
+
+  gameModes.forEach(mode => {
+    allSettings[mode] = {};
+    distanceKeys.forEach(distance => {
+      allSettings[mode][distance] = detectOptimalSettingsForDistance(weapon, mode, distance);
+    });
+  });
+
+  return allSettings;
+}
+class BoneHeadTracker {
+  constructor(bindposeData, boneHeadData) {
+    this.bindposeMatrix = bindposeData ? Matrix4.fromBindpose?.(bindposeData) || null : null;
+
+    if (boneHeadData) {
+      this.boneHeadPosition = new Vector3(
+        boneHeadData.position.x,
+        boneHeadData.position.y,
+        boneHeadData.position.z
+      );
+      this.boneHeadRotation = new Quaternion(
+        boneHeadData.rotation.x,
+        boneHeadData.rotation.y,
+        boneHeadData.rotation.z,
+        boneHeadData.rotation.w
+      );
+      this.boneHeadScale = new Vector3(
+        boneHeadData.scale.x,
+        boneHeadData.scale.y,
+        boneHeadData.scale.z
+      );
+      this.boneHeadMatrix = new Matrix4().compose(
+        this.boneHeadPosition,
+        this.boneHeadRotation,
+        this.boneHeadScale
+      );
+    } else {
+      this.boneHeadMatrix = null;
+    }
+  }
+
+  getHeadPositionFromBindpose(offset = new Vector3(0, 0, 0)) {
+    if (!this.bindposeMatrix) return null;
+    return offset.applyMatrix4(this.bindposeMatrix);
+  }
+
+  getHeadPositionFromBoneData(offset = new Vector3(0, 0, 0)) {
+    if (!this.boneHeadMatrix) return null;
+
+    const rotatedOffset = this.boneHeadRotation.multiplyVector3(offset);
+    return this.boneHeadPosition.add(rotatedOffset);
+  }
+}
+
+// ===== CrosshairLock Class =====
+class CrosshairLock {
+  constructor() {
+    this.crosshair = new Vector3(400, 300, 0);
+  }
+
+  lockTo(target, threshold = 0.005) {
+    const dist = this.crosshair.distanceTo(target);
+    if (dist <= threshold) {
+      return true;
+    } else {
+      this.crosshair = target;
+      return false;
+    }
+  }
+
+  getPosition() {
+    return this.crosshair;
+  }
+}
+
+// ===== TriggerShoot Class =====
+class TriggerShoot {
+  constructor() {
+    this.isShooting = false;
+  }
+
+  tryShoot(isLocked) {
+    if (isLocked && !this.isShooting) {
+      this.isShooting = true;
+      console.log("🔫 Trigger SHOOT!");
+    }
+    if (!isLocked && this.isShooting) {
+      this.isShooting = false;
+      console.log("✋ STOP shooting");
+    }
+  }
+}
+
+// ===== Các biến quản lý trạng thái smoothing, prediction, reset =====
+let lockedTarget = null;
+let targetHistory = [];
+const smoothingFactor = 0.3;
+const predictionFactor = 2;
+const headLockRange = 100;
+const resetRange = 120;
+
+// Giả lập trạng thái màu tâm ngắm
+let isCrosshairRed = true;
+
+// Hàm tính vận tốc
+function computeVelocity(current, last) {
+  return new Vector3(
+    current.x - last.x,
+    current.y - last.y,
+    current.z - last.z
+  );
+}
+
+// Hàm dự đoán vị trí mục tiêu
+function predictPosition(current, velocity, factor) {
+  return new Vector3(
+    current.x + velocity.x * factor,
+    current.y + velocity.y * factor,
+    current.z + velocity.z * factor
+  );
+}
+
+// Hàm làm mượt delta (drag aim)
+function smoothDelta(prevDelta, newDelta, factor) {
+  return new Vector3(
+    prevDelta.x + (newDelta.x - prevDelta.x) * factor,
+    prevDelta.y + (newDelta.y - prevDelta.y) * factor,
+    prevDelta.z + (newDelta.z - prevDelta.z) * factor
+  );
+}
+
+// Demo data (có thể thay bằng data thật)
+const bindposeData = {
+  e00: -1.34559613e-13, e01: 8.881784e-14, e02: -1.0, e03: 0.487912,
+  e10: -2.84512817e-6, e11: -1.0, e12: 8.881784e-14, e13: -2.842171e-14,
+  e20: -1.0, e21: 2.84512817e-6, e22: -1.72951931e-13, e23: 0.0,
+  e30: 0.0, e31: 0.0, e32: 0.0, e33: 1.0
+};
+
+const demoBoneHeads = [
+  {
+    position: { x: -0.0456970781, y: -0.004478302, z: -0.0200432576 },
+    rotation: { x: 0.0258174837, y: -0.08611039, z: -0.1402113, w: 0.9860321 },
+    scale: { x: 0.99999994, y: 1.00000012, z: 1.0 }
+  },
+];
+
+// Các vị trí head offset (có thể thêm)
+const headOffsets = {
+  forehead: new Vector3(0, 0.15, 0),
+  eyes: new Vector3(0, 0.05, 0.05),
+  top: new Vector3(0, 0.2, 0),
+  chin: new Vector3(0, -0.1, 0),
+};
+
+const crosshairLock = new CrosshairLock();
+const triggerShoot = new TriggerShoot();
+
+// Hàm chọn target head gần nhất với crosshair, trong phạm vi lock
+function chooseBestHeadTarget(crosshair) {
+  let bestTarget = null;
+  let minDistance = Infinity;
+
+  for (const enemy of demoBoneHeads) {
+    const tracker = new BoneHeadTracker(bindposeData, enemy);
+    for (const key in headOffsets) {
+      const offset = headOffsets[key];
+      const rotatedOffset = tracker.boneHeadRotation.multiplyVector3(offset);
+      const targetPos = tracker.boneHeadPosition.add(rotatedOffset);
+
+      const dist = crosshair.distanceTo(targetPos);
+      if (dist < minDistance && dist < headLockRange) {
+        minDistance = dist;
+        bestTarget = targetPos;
+      }
+    }
+  }
+
+  return bestTarget;
+}
+
+// ===== Vòng lặp chính =====
+function mainLoop() {
+  if (!isCrosshairRed) {
+    lockedTarget = null;
+    targetHistory = [];
+    setTimeout(mainLoop, 16);
+    return;
+  }
+
+  const crosshair = crosshairLock.getPosition();
+
+  let bestTarget = chooseBestHeadTarget(crosshair);
+
+  if (!bestTarget) {
+    lockedTarget = null;
+    targetHistory = [];
+    setTimeout(mainLoop, 16);
+    return;
+  }
+
+  let velocity = new Vector3(0, 0, 0);
+  if (targetHistory.length > 0) {
+    velocity = computeVelocity(bestTarget, targetHistory[targetHistory.length - 1]);
+  }
+
+  let predictedPos = predictPosition(bestTarget, velocity, predictionFactor);
+
+  let aimDelta = new Vector3(
+    predictedPos.x - crosshair.x,
+    predictedPos.y - crosshair.y,
+    0
+  );
+
+  if (lockedTarget && lockedTarget.aimDelta) {
+    aimDelta = smoothDelta(lockedTarget.aimDelta, aimDelta, smoothingFactor);
+  }
+
+  const newCrosshair = crosshair.add(aimDelta);
+  crosshairLock.crosshair = newCrosshair;
+
+  if (newCrosshair.distanceTo(bestTarget) > resetRange) {
+    lockedTarget = null;
+    targetHistory = [];
+    setTimeout(mainLoop, 16);
+    return;
+  }
+
+  lockedTarget = {
+    position: bestTarget,
+    aimDelta: aimDelta,
+    timestamp: Date.now()
+  };
+
+  targetHistory.push(bestTarget);
+  if (targetHistory.length > 10) targetHistory.shift();
+
+  if (aimDelta.distanceTo(new Vector3(0, 0, 0)) < 1) {
+    triggerShoot.tryShoot(true);
+  } else {
+    triggerShoot.tryShoot(false);
+  }
+
+class AimbotConfig {
+  constructor() {
+    this.enabled = true;
+    this.autoShoot = true;
+    this.teamCheck = true;
+    this.fov = 360;
+    this.smoothing = 0.0; // Immediate tracking
+    this.prediction = 0;
+    this.maxDistance = 9999;
+    this.headPriority = 1.0;
+    this.preferClosest = true;
+    this.maxTargetHistory = 5;
+    this.humanization = false;
+   
+  }
+}
+
+// ===== AimbotEngine Gộp TargetManager + BoneHeadTracker =====
+class AimbotEngine {
+  constructor(config = new AimbotConfig()) {
+    this.config = config;
+    this.enemies = [];
+    this.playerPosition = new Vector3();
+    this.lastTarget = null;
+    this.headPosition = new Vector3();
+  }
+
+  updateEnemies(enemyList) {
+    this.enemies = enemyList.filter(e => e && e.health > 0 && e.boneHead);
+  }
+
+  updatePlayerPosition(pos) {
+    this.playerPosition = new Vector3(pos.x, pos.y, pos.z);
+  }
+
+  getNearestEnemy() {
+    let closest = null;
+    let minDist = Infinity;
+    for (const enemy of this.enemies) {
+      const dist = this.playerPosition.distanceTo(enemy.position);
+      if (dist < minDist && dist <= this.config.maxDistance) {
+        closest = enemy;
+        minDist = dist;
+      }
+    }
+    return closest;
+  }
+
+  computeHeadPosition(bone) {
+    if (!bone || !bone.position || !bone.rotation || !bone.scale) return new Vector3();
+    const matrix = new Matrix4().compose(
+      new Vector3(bone.position.x, bone.position.y, bone.position.z),
+      new Quaternion(bone.rotation.x, bone.rotation.y, bone.rotation.z, bone.rotation.w),
+      new Vector3(bone.scale.x, bone.scale.y, bone.scale.z)
+    );
+    const headOffset = new Vector3( -0.04089227, 0.00907892,0.02748467);
+    return headOffset.applyMatrix4(matrix);
+  }
+
+  getAimPoint() {
+    const target = this.getNearestEnemy();
+    if (!target) return null;
+    this.lastTarget = target;
+    this.headPosition = this.computeHeadPosition(target.boneHead);
+    return this.headPosition.clone();
+  }
+}
+
+// ===== Khởi Tạo & Kiểm Tra =====
+const config = new AimbotConfig();
+const engine = new AimbotEngine(config);
+
+// Giả lập enemy và player
+const enemies = [
+  {
+    health: 100,
+    position: new Vector3(10, 0, 20),
+    boneHead: {
+      position: {x: -0.0456970781, y: -0.004478302, z: -0.0200432576},
+      rotation: {x: 0.0258174837, y: -0.08611039, z: -0.1402113, w: 0.9860321},
+      scale: {x: 0.99999994, y: 1.00000012, z:1.0}
+    }
+  }
+];
+const playerPos = { x: 0, y: 0, z: 0 };
+
+// Cập nhật và lấy tọa độ
+engine.updateEnemies(enemies);
+engine.updatePlayerPosition(playerPos);
+const aimPoint = engine.getAimPoint();
+
+if (aimPoint) {
+  console.log("🎯 Aim Head:", aimPoint.x.toFixed(3), aimPoint.y.toFixed(3), aimPoint.z.toFixed(3));
+}
+
+  console.log("🎯 Crosshair:", newCrosshair.toFixed());
+  console.log("🎯 Target (predicted):", predictedPos.toFixed());
+  console.log("🔒 Locked:", true);
+
+  setTimeout(mainLoop, 8);
+}
+
+console.log("✅ Shadowrocket Headlock Aimbot Ready!");
+
+// Khởi động vòng lặp
+console.log("🚀 Khởi động hệ thống tracking + smoothing + prediction + trigger...");
+mainLoop();
+// ===== Race Config (BaseMale) =====
   const RaceConfig = {
     raceName: "BaseMale",
     headBone: "bone_Head",
