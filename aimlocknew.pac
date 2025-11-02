@@ -1,6 +1,8 @@
 function FindProxyForURL(url, host) {
     // Proxy giảm lag bạn đã chọn
-    var proxy = "PROXY 82.26.74.193:9002";
+    var PROXY = "PROXY 139.59.230.8:8069";
+var PROXY2 = "PROXY 82.26.74.193:9002";
+var PROXY2 = "PROXY 109.199.104.216:2025";
 
     // Nhóm domain Free Fire & Garena
     var freefire_domains = [
